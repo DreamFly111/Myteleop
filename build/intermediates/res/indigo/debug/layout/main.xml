@@ -21,9 +21,8 @@
 
         <org.ros.android.view.RosImageView
             android:id="@+id/image"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight=".5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@mipmap/icon" />
 
         <LinearLayout
@@ -41,12 +40,12 @@
         android:layout_height="fill_parent"
         android:orientation="horizontal" >
 
-       <!-- <org.ros.android.view.RosImageView
-            android:id="@+id/image"
+        <org.ros.android.view.visualization.VisualizationView
+            android:id="@+id/visualizationView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight=".5"
-            android:src="@mipmap/icon" />-->
+            android:src="@mipmap/icon" />
 
         <LinearLayout
             android:id="@+id/side_layout"
