@@ -4,4 +4,6 @@
     <string name="app_name">Teleop</string>
     <string name="camera_topic">compressed_image</string>
     <string name="joystick_topic">cmd_vel</string>
+
+    <string name="map_topic">map</string>
 </resources>

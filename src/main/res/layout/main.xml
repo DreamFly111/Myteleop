@@ -59,12 +59,12 @@
                 android:layout_height="0dip"
                 android:layout_weight="1" />
 
-            <com.github.rosjava.android_apps.teleop.MyRosImageView
+            <Button
                 android:id="@+id/onOff"
+                android:background="@drawable/teleop"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_weight="2"
-                android:src="@drawable/teleop"/>
+                android:layout_weight="2" />
 
             <org.ros.android.view.VirtualJoystickView
                 android:id="@+id/virtual_joystick"

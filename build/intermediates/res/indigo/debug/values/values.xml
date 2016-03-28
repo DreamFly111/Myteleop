@@ -10,6 +10,7 @@
     <!-- From: file:/D:/android_apps-indigo/teleop/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="joystick_topic">cmd_vel</string>
+    <string name="map_topic">map</string>
     <!-- From: file:/D:/android_apps-indigo/teleop/build/intermediates/exploded-aar/org.ros.android_core/android_10/0.2.0/res/values/values.xml -->
     <eat-comment/>
     <string name="master_uri_hint">http://localhost:11311/</string>

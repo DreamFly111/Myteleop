@@ -37,11 +37,17 @@ import org.ros.android.view.visualization.layer.PathLayer;
 import org.ros.android.view.visualization.layer.PosePublisherLayer;
 import org.ros.android.view.visualization.layer.PoseSubscriberLayer;
 import org.ros.android.view.visualization.layer.RobotLayer;
+import org.ros.message.MessageListener;
 import org.ros.namespace.NameResolver;
+import org.ros.node.ConnectedNode;
 import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
+import org.ros.node.topic.Subscriber;
 
 import java.io.IOException;
+
+import std_msgs.*;
+import std_msgs.String;
 
 /**
  * @author murase@jsk.imi.i.u-tokyo.ac.jp (Kazuto Murase)
@@ -51,6 +57,10 @@ public class MainActivity extends RosAppActivity {
 	private VirtualJoystickView virtualJoystickView;
 	private Button backButton;
 
+	private Listerner listerner;
+	private ConnectedNode connectedNode;
+	private SwitchNodemain switchNodemain;
+	private Button onOff;
 	private VisualizationView visualizationView;
 
 	public MainActivity() {
@@ -72,26 +82,47 @@ public class MainActivity extends RosAppActivity {
         virtualJoystickView = (VirtualJoystickView) findViewById(R.id.virtual_joystick);
         backButton = (Button) findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBackPressed();
-            }
-        });
+			@Override
+			public void onClick(View view) {
+				onBackPressed();
+			}
+		});
+
+		onOff = (Button)findViewById(R.id.onOff);
+		onOff.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				onOff();
+			}
+		});
 
 		visualizationView = (VisualizationView)findViewById(R.id.visualizationView);
 		visualizationView.getCamera().jumpToFrame("map");
-		visualizationView.onCreate(Lists.<Layer>newArrayList(new CameraControlLayer(),
-				new OccupancyGridLayer("map"), new PathLayer("move_base/NavfnROS/plan"), new PathLayer(
-						"move_base_dynamic/NavfnROS/plan"), new LaserScanLayer("base_scan"),
-				new PoseSubscriberLayer("simple_waypoints_server/goal_pose"), new PosePublisherLayer(
-						"simple_waypoints_server/goal_pose"), new RobotLayer("base_footprint")));
+
+		visualizationView.onCreate(Lists.<Layer>newArrayList(//÷±Ω”œ‘ æ
+				new CameraControlLayer(),
+				new OccupancyGridLayer("map"),
+				new PathLayer("move_base/NavfnROS/plan"),
+				new PathLayer("move_base_dynamic/NavfnROS/plan"),
+				new LaserScanLayer("base_scan"),
+				new PoseSubscriberLayer("simple_waypoints_server/goal_pose"),
+				new PosePublisherLayer("simple_waypoints_server/goal_pose"),
+				new RobotLayer("base_footprint")
+		));
+
+
+	}
+
+	private void onOff() {
+		switchNodemain.onStart(connectedNode);//?????
 	}
 
 	@Override
 	protected void init(NodeMainExecutor nodeMainExecutor) {
 		
 		super.init(nodeMainExecutor);
-
+		listerner = new Listerner();
+		switchNodemain = new SwitchNodemain();
 		visualizationView.init(nodeMainExecutor);
 
         try {
@@ -101,15 +132,20 @@ public class MainActivity extends RosAppActivity {
             NodeConfiguration nodeConfiguration =
                     NodeConfiguration.newPublic(local_network_address.getHostAddress(), getMasterUri());
 
-        String joyTopic = remaps.get(getString(R.string.joystick_topic));
-        String camTopic = remaps.get(getString(R.string.camera_topic));
+        java.lang.String joyTopic = remaps.get(getString(R.string.joystick_topic));
+        java.lang.String camTopic = remaps.get(getString(R.string.camera_topic));
+
+		java.lang.String mapTopic = remaps.get(getString(R.string.map_topic));///////////////////////
 
         NameResolver appNameSpace = getMasterNameSpace();
         joyTopic = appNameSpace.resolve(joyTopic).toString();
         camTopic = appNameSpace.resolve(camTopic).toString();
 
+		mapTopic = appNameSpace.resolve(mapTopic).toString();/////////////////////////
+
 		cameraView.setTopicName(camTopic);
         virtualJoystickView.setTopicName(joyTopic);
+
 		
 		nodeMainExecutor.execute(cameraView, nodeConfiguration
 				.setNodeName("android/camera_view"));
@@ -117,6 +153,8 @@ public class MainActivity extends RosAppActivity {
 				nodeConfiguration.setNodeName("android/virtual_joystick"));
 
 		nodeMainExecutor.execute(visualizationView, nodeConfiguration.setNodeName("android/map_view"));
+		//nodeMainExecutor.execute(visualizationView,nodeConfiguration.setNodeName("android_15/visualization_view"));
+		nodeMainExecutor.execute(listerner,nodeConfiguration.setNodeName("android_apps_teleop/listerner"));
         } catch (IOException e) {
             // Socket problem
         }
